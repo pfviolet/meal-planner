@@ -6,21 +6,26 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="식단플래너">
-<meta name="theme-color" content="#EAF3DE">
+<meta name="theme-color" content="#EBF4FB">
 <title>식단 플래너</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='44' fill='%23EAF3DE'/><path d='M38 100 Q38 148 96 148 Q154 148 154 100 Z' fill='%23C0DD97' stroke='%23639922' stroke-width='5'/><ellipse cx='96' cy='100' rx='58' ry='14' fill='%23C0DD97' stroke='%23639922' stroke-width='5'/><ellipse cx='96' cy='100' rx='52' ry='10' fill='white'/><circle cx='80' cy='84' r='14' fill='%23639922'/><circle cx='70' cy='78' r='11' fill='%23639922'/><circle cx='90' cy='76' r='12' fill='%23639922'/><rect x='77' y='92' width='6' height='12' rx='3' fill='%233B6D11'/><ellipse cx='116' cy='83' rx='8' ry='13' fill='%23EF9F27' transform='rotate(15 116 83)'/><line x1='116' y1='70' x2='112' y2='62' stroke='%23639922' stroke-width='3' stroke-linecap='round'/><line x1='116' y1='70' x2='116' y2='61' stroke='%23639922' stroke-width='3' stroke-linecap='round'/><line x1='116' y1='70' x2='120' y2='62' stroke='%23639922' stroke-width='3' stroke-linecap='round'/><circle cx='96' cy='88' r='10' fill='%23E24B4A'/><line x1='96' y1='78' x2='94' y2='72' stroke='%23639922' stroke-width='3' stroke-linecap='round'/><line x1='96' y1='78' x2='99' y2='72' stroke='%23639922' stroke-width='3' stroke-linecap='round'/></svg>">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f9fc;min-height:100dvh;max-width:480px;margin:0 auto}
-:root{--blue:#185FA5;--blue-light:#EBF4FB;--border:#C8DFF0;--text:#1a1a1a;--muted:#888780;--faint:#B4B2A9;--green:#639922;--green-light:#EAF3DE}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f9fc;min-height:100dvh;max-width:480px;margin:0 auto;position:relative}
+:root{--blue:#185FA5;--blue-light:#EBF4FB;--blue-mid:#D6EAFA;--border:#C8DFF0;--text:#1a1a1a;--muted:#888780;--faint:#B4B2A9}
 button{font-family:inherit;cursor:pointer}
 .header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;background:#fff;border-bottom:0.5px solid var(--border);position:sticky;top:0;z-index:10}
 .header h1{font-size:17px;font-weight:600;color:var(--text)}
+.header-right{display:flex;align-items:center;gap:8px}
 .search-btn{background:none;border:0.5px solid var(--border);border-radius:20px;padding:5px 12px;color:var(--muted);font-size:13px;display:flex;align-items:center;gap:4px}
 .search-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+.sync-status{font-size:11px;color:var(--faint);display:flex;align-items:center;gap:3px}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--faint)}
+.sync-dot.ok{background:#4CAF50}
+.sync-dot.syncing{background:#FF9800;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
 .week-nav{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:#fff;border-bottom:0.5px solid var(--border)}
 .week-nav span{font-size:14px;font-weight:500;color:var(--text)}
-.nav-btn{background:none;border:none;padding:4px 8px;color:var(--muted);font-size:22px;line-height:1}
+.nav-btn{background:none;border:none;padding:4px 8px;color:var(--muted);font-size:22px;line-height:1;display:flex;align-items:center}
 .week-table{margin:12px 10px;border:0.5px solid var(--border);border-radius:10px;overflow:hidden;background:#fff}
 .day-row{display:flex;align-items:stretch;border-bottom:0.5px solid var(--border)}
 .day-row:last-child{border-bottom:none}
@@ -28,24 +33,24 @@ button{font-family:inherit;cursor:pointer}
 .day-row.odd{background:#fff}
 .day-label{width:48px;flex-shrink:0;border-right:0.5px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0;gap:2px}
 .day-label.today{background:#D6EAFA}
-.day-name{font-size:13px;color:var(--muted)}
+.day-name{font-size:13px;font-weight:400;color:var(--muted)}
 .day-name.today-text{color:var(--blue);font-weight:600}
 .day-name.weekend{color:#D85A30}
 .day-date{font-size:11px;color:var(--faint)}
 .day-date.today-text{color:var(--blue);font-weight:600}
-.menu-cell{flex:1;padding:6px 10px;min-height:44px;display:flex;align-items:center;flex-wrap:wrap;gap:5px;cursor:pointer}
-.menu-tag{font-size:13px;padding:2px 8px;border-radius:12px;cursor:pointer;white-space:nowrap}
-.menu-tag.no-recipe{background:#f0f0f0;color:var(--text)}
-.menu-tag.has-recipe{background:#D6EAFA;color:var(--blue);font-weight:500}
-.menu-placeholder{font-size:20px;color:#D6EAFA;font-weight:300}
-.menu-input{border:none;outline:none;font-size:13px;background:transparent;color:var(--text);width:100%;font-family:inherit;padding:0}
+.menu-cell{flex:1;padding:8px 10px;min-height:44px;display:flex;align-items:center;cursor:pointer}
+.menu-text{font-size:14px;color:var(--text);line-height:1.5;word-break:break-all}
+.menu-text.has-recipe{color:var(--blue);font-weight:500}
+.menu-placeholder{font-size:20px;color:#D6EAFA;font-weight:300;line-height:1}
+.menu-input{border:none;outline:none;font-size:14px;background:transparent;color:var(--text);width:100%;font-family:inherit;padding:0}
+.recipe-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--blue);margin-left:5px;vertical-align:middle;opacity:0.7}
 .overlay{position:fixed;inset:0;background:#fff;z-index:100;display:flex;flex-direction:column;max-width:480px;margin:0 auto}
 .overlay-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:0.5px solid var(--border);flex-shrink:0}
 .overlay-title{font-size:16px;font-weight:600;color:var(--text)}
 .close-btn{background:none;border:none;font-size:24px;color:var(--muted);line-height:1;padding:2px}
 .overlay-body{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch}
 .overlay-footer{padding:14px 16px 32px;display:flex;gap:8px;flex-shrink:0;border-top:0.5px solid var(--border)}
-.field-label{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px}
+.field-label{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px;letter-spacing:0.03em}
 .field-wrap{margin-bottom:18px}
 .field-wrap:last-child{margin-bottom:0}
 textarea{width:100%;border:0.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:14px;background:#F7FBFE;color:var(--text);resize:none;line-height:1.7;font-family:inherit}
@@ -53,7 +58,7 @@ textarea:focus{outline:none;border-color:var(--blue)}
 .btn-del{flex:1;padding:12px 0;border-radius:8px;border:0.5px solid var(--border);background:none;font-size:13px;color:var(--muted);font-family:inherit}
 .btn-save{flex:2;padding:12px 0;border-radius:8px;border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:600;font-family:inherit}
 .search-input-wrap{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:0.5px solid var(--border)}
-.back-btn{background:none;border:none;font-size:22px;color:var(--muted);padding:0;line-height:1}
+.back-btn{background:none;border:none;font-size:22px;color:var(--muted);padding:0;line-height:1;display:flex}
 .search-input{flex:1;border:none;outline:none;font-size:15px;background:transparent;color:var(--text);font-family:inherit}
 .clear-btn{background:none;border:none;font-size:18px;color:var(--muted);padding:0}
 .search-hint{color:var(--faint);font-size:14px;text-align:center;margin-top:50px}
@@ -63,16 +68,23 @@ textarea:focus{outline:none;border-color:var(--blue)}
 .result-row{font-size:13px;color:var(--text);margin-top:4px}
 .result-lbl{color:var(--muted)}
 mark{background:#B5D4F4;color:#042C53;border-radius:2px;padding:0 1px}
+.loading{text-align:center;padding:40px;color:var(--faint);font-size:14px}
 </style>
 </head>
 <body>
 
 <div class="header">
   <h1>식단 플래너</h1>
-  <button class="search-btn" onclick="openSearch()">
-    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    검색
-  </button>
+  <div class="header-right">
+    <div class="sync-status">
+      <div class="sync-dot" id="sync-dot"></div>
+      <span id="sync-text">연결 중</span>
+    </div>
+    <button class="search-btn" onclick="openSearch()">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      검색
+    </button>
+  </div>
 </div>
 
 <div class="week-nav">
@@ -81,7 +93,7 @@ mark{background:#B5D4F4;color:#042C53;border-radius:2px;padding:0 1px}
   <button class="nav-btn" onclick="changeWeek(1)">&#8250;</button>
 </div>
 
-<div class="week-table" id="week-table"></div>
+<div class="week-table" id="week-table"><div class="loading">불러오는 중...</div></div>
 
 <!-- Recipe Overlay -->
 <div class="overlay" id="recipe-overlay" style="display:none">
@@ -116,19 +128,71 @@ mark{background:#B5D4F4;color:#042C53;border-radius:2px;padding:0 1px}
     <input class="search-input" id="search-input" type="text" placeholder="재료명으로 레시피 검색" oninput="renderSearch()">
     <button class="clear-btn" id="clear-btn" onclick="clearSearch()" style="display:none">&#x2715;</button>
   </div>
-  <div class="overlay-body" id="search-results"></div>
+  <div class="overlay-body" id="search-results"><p class="search-hint">재료명을 입력하세요</p></div>
 </div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, setDoc, deleteDoc, collection, getDocs, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDV7JK4jzLsju56YlcLMr0xOoatEfR3w8U",
+  authDomain: "meal-planner-c40d7.firebaseapp.com",
+  projectId: "meal-planner-c40d7",
+  storageBucket: "meal-planner-c40d7.firebasestorage.app",
+  messagingSenderId: "95069158854",
+  appId: "1:95069158854:web:816ca771eb7d50afce06c7"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const DAYS = ["월","화","수","목","금","토","일"];
-const KEY = "meal_v4";
 let data = {};
 let weekOffset = 0;
-let activeKey = null; // "dateKey__메뉴명"
+let activeKey = null;
 
-try { data = JSON.parse(localStorage.getItem(KEY)) || {}; } catch {}
+// 동기화 상태 표시
+function setSyncStatus(state) {
+  const dot = document.getElementById("sync-dot");
+  const txt = document.getElementById("sync-text");
+  if (state === "ok") { dot.className = "sync-dot ok"; txt.textContent = "동기화됨"; }
+  else if (state === "syncing") { dot.className = "sync-dot syncing"; txt.textContent = "저장 중"; }
+  else { dot.className = "sync-dot"; txt.textContent = "연결 중"; }
+}
 
-function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch {} }
+// Firestore 실시간 구독
+const colRef = collection(db, "meals");
+onSnapshot(colRef, (snapshot) => {
+  snapshot.docChanges().forEach(change => {
+    if (change.type === "removed") {
+      delete data[change.doc.id];
+    } else {
+      data[change.doc.id] = change.doc.data();
+    }
+  });
+  setSyncStatus("ok");
+  render();
+}, (err) => {
+  setSyncStatus("error");
+  console.error(err);
+});
+
+async function saveCell(key, cell) {
+  setSyncStatus("syncing");
+  try {
+    await setDoc(doc(db, "meals", key), cell);
+    setSyncStatus("ok");
+  } catch(e) { console.error(e); }
+}
+
+async function removeCell(key) {
+  setSyncStatus("syncing");
+  try {
+    await deleteDoc(doc(db, "meals", key));
+    setSyncStatus("ok");
+  } catch(e) { console.error(e); }
+}
 
 function getWeekStart(offset) {
   const now = new Date(); now.setHours(0,0,0,0);
@@ -150,22 +214,7 @@ function weekLabel(offset) {
   return `${ws.getMonth()+1}/${ws.getDate()} ~ ${we.getMonth()+1}/${we.getDate()}`;
 }
 
-function changeWeek(dir) { weekOffset += dir; render(); }
-
-// data[dateKey] = { menuText: "김치찌개 된장국", recipes: { "김치찌개": {...}, "된장국": {...} } }
-function getDayData(dk) { return data[dk] || { menuText:"", recipes:{} }; }
-
-function getMenus(dk) {
-  const d = getDayData(dk);
-  if (!d.menuText.trim()) return [];
-  return d.menuText.trim().split(" ").filter(m => m.length > 0);
-}
-
-function hasRecipe(dk, menu) {
-  const d = getDayData(dk);
-  const r = d.recipes && d.recipes[menu];
-  return r && (r.ingredients || r.seasoning || r.steps);
-}
+window.changeWeek = (dir) => { weekOffset += dir; render(); };
 
 function render() {
   document.getElementById("week-label").textContent = weekLabel(weekOffset);
@@ -176,164 +225,122 @@ function render() {
 
   for (let i = 0; i < 7; i++) {
     const d = new Date(ws); d.setDate(ws.getDate() + i);
-    const dk = dateKey(d);
+    const key = dateKey(d);
+    const cell = data[key] || { menu:"", recipe:null };
     const isToday = d.getTime() === today.getTime();
+    const hasRecipe = cell.recipe && (cell.recipe.ingredients || cell.recipe.seasoning || cell.recipe.steps);
     const isWknd = i >= 5;
-    const menus = getMenus(dk);
-    const dayData = getDayData(dk);
 
     const row = document.createElement("div");
     row.className = `day-row ${i%2===0?"even":"odd"}`;
 
-    // Day label
     const lbl = document.createElement("div");
     lbl.className = `day-label${isToday?" today":""}`;
     lbl.innerHTML = `
       <div class="day-name${isToday?" today-text":isWknd?" weekend":""}">${DAYS[i]}</div>
       <div class="day-date${isToday?" today-text":""}">${d.getMonth()+1}/${d.getDate()}</div>`;
 
-    // Menu cell
     const mc = document.createElement("div");
     mc.className = "menu-cell";
+    mc.dataset.key = key;
 
-    if (menus.length > 0) {
-      // 각 메뉴를 태그로 표시
-      menus.forEach(menu => {
-        const tag = document.createElement("span");
-        tag.className = `menu-tag ${hasRecipe(dk, menu) ? "has-recipe" : "no-recipe"}`;
-        tag.textContent = menu;
-        tag.onclick = (e) => { e.stopPropagation(); openRecipe(dk, menu); };
-        mc.appendChild(tag);
-      });
-      // 빈 공간 클릭하면 편집
-      mc.onclick = () => startEdit(dk, mc, dayData.menuText);
+    if (cell.menu) {
+      const span = document.createElement("span");
+      span.className = `menu-text${hasRecipe?" has-recipe":""}`;
+      span.textContent = cell.menu;
+      if (hasRecipe) { const dot = document.createElement("span"); dot.className = "recipe-dot"; span.appendChild(dot); }
+      mc.appendChild(span);
+      mc.onclick = () => openRecipe(key);
     } else {
       const ph = document.createElement("span");
-      ph.className = "menu-placeholder";
-      ph.textContent = "+";
+      ph.className = "menu-placeholder"; ph.textContent = "+";
       mc.appendChild(ph);
-      mc.onclick = () => startEdit(dk, mc, "");
+      mc.onclick = () => startEdit(key, mc);
     }
 
-    row.appendChild(lbl);
-    row.appendChild(mc);
+    row.appendChild(lbl); row.appendChild(mc);
     table.appendChild(row);
   }
 }
 
-function startEdit(dk, mc, currentText) {
-  mc.innerHTML = "";
-  mc.onclick = null;
+function startEdit(key, mc) {
+  mc.onclick = null; mc.innerHTML = "";
   const inp = document.createElement("input");
-  inp.className = "menu-input";
-  inp.placeholder = "메뉴 입력 (띄어쓰기로 구분)";
-  inp.value = currentText;
-  mc.appendChild(inp);
-  inp.focus();
-  inp.setSelectionRange(inp.value.length, inp.value.length);
-
+  inp.className = "menu-input"; inp.placeholder = "메뉴 입력…";
+  inp.value = (data[key] && data[key].menu) || "";
+  mc.appendChild(inp); inp.focus();
   const commit = () => {
-    if (!data[dk]) data[dk] = { menuText:"", recipes:{} };
-    const oldMenus = getMenus(dk);
-    const newText = inp.value.trim();
-    const newMenus = newText ? newText.split(" ").filter(m=>m.length>0) : [];
-    // 기존 레시피 보존, 없어진 메뉴는 삭제
-    const oldRecipes = data[dk].recipes || {};
-    const newRecipes = {};
-    newMenus.forEach(m => { if (oldRecipes[m]) newRecipes[m] = oldRecipes[m]; });
-    data[dk] = { menuText: newText, recipes: newRecipes };
-    save();
+    const val = inp.value.trim();
+    if (val) { const cell = { menu: val, recipe: (data[key] && data[key].recipe) || null }; data[key] = cell; saveCell(key, cell); }
     render();
   };
   inp.addEventListener("blur", commit);
-  inp.addEventListener("keydown", e => {
-    if (e.key === "Enter") { inp.blur(); }
-    if (e.key === "Escape") { inp.removeEventListener("blur", commit); render(); }
-  });
+  inp.addEventListener("keydown", e => { if(e.key==="Enter"){inp.blur();} if(e.key==="Escape"){render();} });
 }
 
-function openRecipe(dk, menu) {
-  activeKey = dk;
-  activeMenu = menu;
-  const dayData = getDayData(dk);
-  const r = (dayData.recipes && dayData.recipes[menu]) || { ingredients:"", seasoning:"", steps:"" };
-  document.getElementById("recipe-title").textContent = menu;
+function openRecipe(key) {
+  activeKey = key;
+  const cell = data[key] || { menu:"", recipe:null };
+  const r = cell.recipe || { ingredients:"", seasoning:"", steps:"" };
+  document.getElementById("recipe-title").textContent = cell.menu;
   document.getElementById("r-ingredients").value = r.ingredients || "";
   document.getElementById("r-seasoning").value = r.seasoning || "";
   document.getElementById("r-steps").value = r.steps || "";
   document.getElementById("recipe-overlay").style.display = "flex";
 }
 
-let activeMenu = null;
+window.closeRecipe = () => { document.getElementById("recipe-overlay").style.display = "none"; activeKey = null; };
 
-function closeRecipe() { document.getElementById("recipe-overlay").style.display = "none"; activeKey = null; activeMenu = null; }
-
-function saveRecipe() {
-  if (!activeKey || !activeMenu) return;
-  if (!data[activeKey]) data[activeKey] = { menuText:"", recipes:{} };
-  if (!data[activeKey].recipes) data[activeKey].recipes = {};
-  data[activeKey].recipes[activeMenu] = {
+window.saveRecipe = () => {
+  if (!activeKey) return;
+  const cell = { ...(data[activeKey] || {}), recipe: {
     ingredients: document.getElementById("r-ingredients").value,
     seasoning: document.getElementById("r-seasoning").value,
     steps: document.getElementById("r-steps").value,
-  };
-  save(); render(); closeRecipe();
-}
+  }};
+  data[activeKey] = cell;
+  saveCell(activeKey, cell);
+  render(); window.closeRecipe();
+};
 
-function deleteMenu() {
-  if (!activeKey || !activeMenu) return;
-  const dayData = getDayData(activeKey);
-  // 해당 메뉴만 menuText에서 제거
-  const menus = getMenus(activeKey).filter(m => m !== activeMenu);
-  if (!data[activeKey]) data[activeKey] = { menuText:"", recipes:{} };
-  data[activeKey].menuText = menus.join(" ");
-  if (data[activeKey].recipes) delete data[activeKey].recipes[activeMenu];
-  save(); render(); closeRecipe();
-}
+window.deleteMenu = () => {
+  if (!activeKey) return;
+  removeCell(activeKey);
+  delete data[activeKey];
+  render(); window.closeRecipe();
+};
 
-function openSearch() {
+window.openSearch = () => {
   document.getElementById("search-overlay").style.display = "flex";
   setTimeout(() => document.getElementById("search-input").focus(), 100);
-}
-function closeSearch() { document.getElementById("search-overlay").style.display = "none"; }
-function clearSearch() { document.getElementById("search-input").value = ""; renderSearch(); }
+};
+window.closeSearch = () => { document.getElementById("search-overlay").style.display = "none"; };
+window.clearSearch = () => { document.getElementById("search-input").value = ""; window.renderSearch(); };
 
-function renderSearch() {
+window.renderSearch = () => {
   const q = document.getElementById("search-input").value.trim().toLowerCase();
   document.getElementById("clear-btn").style.display = q ? "block" : "none";
   const el = document.getElementById("search-results");
   if (!q) { el.innerHTML = '<p class="search-hint">재료명을 입력하세요</p>'; return; }
-
-  const results = [];
-  Object.entries(data).forEach(([dk, dayData]) => {
-    if (!dayData.recipes) return;
-    Object.entries(dayData.recipes).forEach(([menu, r]) => {
-      if (!r) return;
-      const allText = [menu, r.ingredients, r.seasoning, r.steps].join(" ").toLowerCase();
-      if (allText.includes(q)) results.push({ dk, menu, r });
-    });
+  const results = Object.entries(data).filter(([,c]) => {
+    if (!c.recipe) return false;
+    return [c.menu, c.recipe.ingredients, c.recipe.seasoning, c.recipe.steps].join(" ").toLowerCase().includes(q);
   });
-
   if (!results.length) { el.innerHTML = '<p class="search-hint">검색 결과 없음</p>'; return; }
-
   const hl = t => t ? t.replace(new RegExp(`(${q})`, "gi"), "<mark>$1</mark>") : "";
-
-  el.innerHTML = results.map(({dk, menu, r}) => {
-    const d = new Date(dk);
-    const dayName = DAYS[(d.getDay()+6)%7];
+  el.innerHTML = results.map(([key,c]) => {
+    const d = new Date(key);
     return `<div class="result-card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
-        <span class="result-menu">${menu}</span>
-        <span class="result-date">${d.getMonth()+1}/${d.getDate()} (${dayName})</span>
+        <span class="result-menu">${c.menu}</span>
+        <span class="result-date">${d.getMonth()+1}/${d.getDate()} (${DAYS[(d.getDay()+6)%7]})</span>
       </div>
-      ${r.ingredients?`<div class="result-row"><span class="result-lbl">재료  </span>${hl(r.ingredients)}</div>`:""}
-      ${r.seasoning?`<div class="result-row"><span class="result-lbl">양념  </span>${hl(r.seasoning)}</div>`:""}
-      ${r.steps?`<div class="result-row"><span class="result-lbl">순서  </span>${hl(r.steps)}</div>`:""}
+      ${c.recipe?.ingredients?`<div class="result-row"><span class="result-lbl">재료  </span>${hl(c.recipe.ingredients)}</div>`:""}
+      ${c.recipe?.seasoning?`<div class="result-row"><span class="result-lbl">양념  </span>${hl(c.recipe.seasoning)}</div>`:""}
+      ${c.recipe?.steps?`<div class="result-row"><span class="result-lbl">순서  </span>${hl(c.recipe.steps)}</div>`:""}
     </div>`;
   }).join("");
-}
-
-render();
+};
 </script>
 </body>
 </html>
