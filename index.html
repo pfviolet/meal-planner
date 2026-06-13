@@ -179,16 +179,15 @@ async function removeCell(key) {
 // 날짜의 모든 메뉴 항목 반환 (기존 형식 + 새 형식 모두 지원)
 function getDayMenus(dateKey) {
   const items = [];
-  // 기존 형식: 키가 날짜 그대로 (예: 2025-06-13)
+  // 기존 형식: 키가 날짜 그대로 (예: 2026-05-24)
   if(data[dateKey] && data[dateKey].menu) {
     items.push({key: dateKey, ...data[dateKey]});
-    return items;
   }
-  // 새 형식: 키가 날짜_인덱스 (예: 2025-06-13_0)
+  // 새 형식: 키가 날짜_인덱스 (예: 2026-05-24_0)
   let i = 0;
   while(true) {
     const k = `${dateKey}_${i}`;
-    if(data[k]) { items.push({key:k, ...data[k]}); i++; }
+    if(data[k] && data[k].menu) { items.push({key:k, ...data[k]}); i++; }
     else break;
   }
   return items;
