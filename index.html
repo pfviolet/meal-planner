@@ -176,9 +176,15 @@ async function removeCell(key) {
   setSyncStatus("ok");
 }
 
-// 날짜의 모든 메뉴 항목 반환 (인덱스 순서대로)
+// 날짜의 모든 메뉴 항목 반환 (기존 형식 + 새 형식 모두 지원)
 function getDayMenus(dateKey) {
   const items = [];
+  // 기존 형식: 키가 날짜 그대로 (예: 2025-06-13)
+  if(data[dateKey] && data[dateKey].menu) {
+    items.push({key: dateKey, ...data[dateKey]});
+    return items;
+  }
+  // 새 형식: 키가 날짜_인덱스 (예: 2025-06-13_0)
   let i = 0;
   while(true) {
     const k = `${dateKey}_${i}`;
