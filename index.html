@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="식단플래너">
+<meta name="theme-color" content="#EBF4FB">
+<title>식단 플래너</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f9fc;min-height:100dvh;max-width:480px;margin:0 auto;position:relative}
+:root{--blue:#185FA5;--blue-light:#EBF4FB;--blue-mid:#D6EAFA;--border:#C8DFF0;--text:#1a1a1a;--muted:#888780;--faint:#B4B2A9}
+button{font-family:inherit;cursor:pointer}
+
+/* Header */
+.header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;background:#fff;border-bottom:0.5px solid var(--border);position:sticky;top:0;z-index:10}
+.header h1{font-size:17px;font-weight:600;color:var(--text)}
+.search-btn{background:none;border:0.5px solid var(--border);border-radius:20px;padding:5px 12px;color:var(--muted);font-size:13px;display:flex;align-items:center;gap:4px}
+.search-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2}
+
+/* Week nav */
+.week-nav{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:#fff;border-bottom:0.5px solid var(--border)}
+.week-nav span{font-size:14px;font-weight:500;color:var(--text)}
+.nav-btn{background:none;border:none;padding:4px 8px;color:var(--muted);font-size:22px;line-height:1;display:flex;align-items:center}
+
+/* Table */
+.week-table{margin:12px 10px;border:0.5px solid var(--border);border-radius:10px;overflow:hidden;background:#fff}
+.day-row{display:flex;align-items:stretch;border-bottom:0.5px solid var(--border)}
+.day-row:last-child{border-bottom:none}
+.day-row.even{background:#EBF4FB}
+.day-row.odd{background:#fff}
+.day-label{width:48px;flex-shrink:0;border-right:0.5px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 0;gap:2px}
+.day-label.today{background:#D6EAFA}
+.day-name{font-size:13px;font-weight:400;color:var(--muted)}
+.day-name.today-text{color:var(--blue);font-weight:600}
+.day-name.weekend{color:#D85A30}
+.day-date{font-size:11px;color:var(--faint)}
+.day-date.today-text{color:var(--blue);font-weight:600}
+.menu-cell{flex:1;padding:8px 10px;min-height:44px;display:flex;align-items:center;cursor:pointer}
+.menu-text{font-size:14px;color:var(--text);line-height:1.5;word-break:break-all}
+.menu-text.has-recipe{color:var(--blue);font-weight:500}
+.menu-placeholder{font-size:20px;color:#D6EAFA;font-weight:300;line-height:1}
+.menu-input{border:none;outline:none;font-size:14px;background:transparent;color:var(--text);width:100%;font-family:inherit;padding:0}
+
+/* Full-screen overlay */
+.overlay{position:fixed;inset:0;background:#fff;z-index:100;display:flex;flex-direction:column;max-width:480px;margin:0 auto}
+.overlay-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:0.5px solid var(--border);flex-shrink:0}
+.overlay-title{font-size:16px;font-weight:600;color:var(--text)}
+.close-btn{background:none;border:none;font-size:24px;color:var(--muted);line-height:1;padding:2px}
+.overlay-body{flex:1;overflow-y:auto;padding:16px;-webkit-overflow-scrolling:touch}
+.overlay-footer{padding:14px 16px 32px;display:flex;gap:8px;flex-shrink:0;border-top:0.5px solid var(--border)}
+
+/* Recipe fields */
+.field-label{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px;letter-spacing:0.03em}
+.field-wrap{margin-bottom:18px}
+.field-wrap:last-child{margin-bottom:0}
+textarea{width:100%;border:0.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:14px;background:#F7FBFE;color:var(--text);resize:none;line-height:1.7;font-family:inherit}
+textarea:focus{outline:none;border-color:var(--blue)}
+
+/* Buttons */
+.btn-del{flex:1;padding:12px 0;border-radius:8px;border:0.5px solid var(--border);background:none;font-size:13px;color:var(--muted);font-family:inherit}
+.btn-save{flex:2;padding:12px 0;border-radius:8px;border:none;background:var(--blue);color:#fff;font-size:14px;font-weight:600;font-family:inherit}
+
+/* Search */
+.search-input-wrap{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:0.5px solid var(--border)}
+.back-btn{background:none;border:none;font-size:22px;color:var(--muted);padding:0;line-height:1;display:flex}
+.search-input{flex:1;border:none;outline:none;font-size:15px;background:transparent;color:var(--text);font-family:inherit}
+.clear-btn{background:none;border:none;font-size:18px;color:var(--muted);padding:0}
+.search-hint{color:var(--faint);font-size:14px;text-align:center;margin-top:50px}
+.result-card{background:#F7FBFE;border:0.5px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.result-menu{font-size:14px;font-weight:600;color:var(--blue)}
+.result-date{font-size:11px;color:var(--faint)}
+.result-row{font-size:13px;color:var(--text);margin-top:4px}
+.result-lbl{color:var(--muted)}
+mark{background:#B5D4F4;color:#042C53;border-radius:2px;padding:0 1px}
+
+/* Badge */
+.recipe-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--blue);margin-left:5px;vertical-align:middle;opacity:0.7}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>식단 플래너</h1>
+  <button class="search-btn" onclick="openSearch()">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    검색
+  </button>
+</div>
+
+<div class="week-nav">
+  <button class="nav-btn" onclick="changeWeek(-1)">&#8249;</button>
+  <span id="week-label"></span>
+  <button class="nav-btn" onclick="changeWeek(1)">&#8250;</button>
+</div>
+
+<div class="week-table" id="week-table"></div>
+
+<!-- Recipe Overlay -->
+<div class="overlay" id="recipe-overlay" style="display:none">
+  <div class="overlay-header">
+    <span class="overlay-title" id="recipe-title"></span>
+    <button class="close-btn" onclick="closeRecipe()">&#x2715;</button>
+  </div>
+  <div class="overlay-body">
+    <div class="field-wrap">
+      <div class="field-label">재료</div>
+      <textarea id="r-ingredients" rows="3" placeholder="예) 소고기 200g, 마늘쫑 150g"></textarea>
+    </div>
+    <div class="field-wrap">
+      <div class="field-label">양념</div>
+      <textarea id="r-seasoning" rows="3" placeholder="예) 간장 2T, 참기름 1T"></textarea>
+    </div>
+    <div class="field-wrap">
+      <div class="field-label">순서</div>
+      <textarea id="r-steps" rows="6" placeholder="예) 1. 재료 손질&#10;2. 볶기"></textarea>
+    </div>
+  </div>
+  <div class="overlay-footer">
+    <button class="btn-del" onclick="deleteMenu()">삭제</button>
+    <button class="btn-save" onclick="saveRecipe()">저장</button>
+  </div>
+</div>
+
+<!-- Search Overlay -->
+<div class="overlay" id="search-overlay" style="display:none">
+  <div class="search-input-wrap">
+    <button class="back-btn" onclick="closeSearch()">&#8592;</button>
+    <input class="search-input" id="search-input" type="text" placeholder="재료명으로 레시피 검색" oninput="renderSearch()">
+    <button class="clear-btn" id="clear-btn" onclick="clearSearch()" style="display:none">&#x2715;</button>
+  </div>
+  <div class="overlay-body" id="search-results"></div>
+</div>
+
+<script>
+const DAYS = ["월","화","수","목","금","토","일"];
+const KEY = "meal_v3";
+let data = {};
+let weekOffset = 0;
+let activeKey = null;
+
+try { data = JSON.parse(localStorage.getItem(KEY)) || {}; } catch {}
+
+function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch {} }
+
+function getWeekStart(offset) {
+  const now = new Date(); now.setHours(0,0,0,0);
+  const dow = now.getDay();
+  const diff = dow === 0 ? -6 : 1 - dow;
+  const d = new Date(now);
+  d.setDate(now.getDate() + diff + offset * 7);
+  return d;
+}
+
+function dateKey(d) { return d.toISOString().slice(0,10); }
+
+function weekLabel(offset) {
+  if (offset === 0) return "이번 주";
+  if (offset === -1) return "지난 주";
+  if (offset === 1) return "다음 주";
+  const ws = getWeekStart(offset);
+  const we = new Date(ws); we.setDate(ws.getDate()+6);
+  return `${ws.getMonth()+1}/${ws.getDate()} ~ ${we.getMonth()+1}/${we.getDate()}`;
+}
+
+function changeWeek(dir) { weekOffset += dir; render(); }
+
+function render() {
+  document.getElementById("week-label").textContent = weekLabel(weekOffset);
+  const ws = getWeekStart(weekOffset);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const table = document.getElementById("week-table");
+  table.innerHTML = "";
+
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(ws); d.setDate(ws.getDate() + i);
+    const key = dateKey(d);
+    const cell = data[key] || { menu:"", recipe:null };
+    const isToday = d.getTime() === today.getTime();
+    const hasRecipe = cell.recipe && (cell.recipe.ingredients || cell.recipe.seasoning || cell.recipe.steps);
+    const isWknd = i >= 5;
+
+    const row = document.createElement("div");
+    row.className = `day-row ${i%2===0?"even":"odd"}`;
+
+    const lbl = document.createElement("div");
+    lbl.className = `day-label${isToday?" today":""}`;
+    lbl.innerHTML = `
+      <div class="day-name${isToday?" today-text":isWknd?" weekend":""}">${DAYS[i]}</div>
+      <div class="day-date${isToday?" today-text":""}">${d.getMonth()+1}/${d.getDate()}</div>`;
+
+    const mc = document.createElement("div");
+    mc.className = "menu-cell";
+    mc.dataset.key = key;
+
+    if (cell.menu) {
+      const span = document.createElement("span");
+      span.className = `menu-text${hasRecipe?" has-recipe":""}`;
+      span.textContent = cell.menu;
+      if (hasRecipe) {
+        const dot = document.createElement("span");
+        dot.className = "recipe-dot";
+        span.appendChild(dot);
+      }
+      mc.appendChild(span);
+      mc.onclick = () => openRecipe(key);
+    } else {
+      const ph = document.createElement("span");
+      ph.className = "menu-placeholder";
+      ph.textContent = "+";
+      mc.appendChild(ph);
+      mc.onclick = () => startEdit(key, mc);
+    }
+
+    row.appendChild(lbl);
+    row.appendChild(mc);
+    table.appendChild(row);
+  }
+}
+
+function startEdit(key, mc) {
+  mc.onclick = null;
+  mc.innerHTML = "";
+  const inp = document.createElement("input");
+  inp.className = "menu-input";
+  inp.placeholder = "메뉴 입력…";
+  inp.value = (data[key] && data[key].menu) || "";
+  mc.appendChild(inp);
+  inp.focus();
+  const commit = () => {
+    const val = inp.value.trim();
+    if (!data[key]) data[key] = { menu:"", recipe:null };
+    data[key].menu = val;
+    save();
+    render();
+  };
+  inp.addEventListener("blur", commit);
+  inp.addEventListener("keydown", e => { if(e.key==="Enter"){inp.blur();} if(e.key==="Escape"){inp.removeEventListener("blur",commit);render();} });
+}
+
+function openRecipe(key) {
+  activeKey = key;
+  const cell = data[key] || { menu:"", recipe:null };
+  const r = cell.recipe || { ingredients:"", seasoning:"", steps:"" };
+  document.getElementById("recipe-title").textContent = cell.menu;
+  document.getElementById("r-ingredients").value = r.ingredients || "";
+  document.getElementById("r-seasoning").value = r.seasoning || "";
+  document.getElementById("r-steps").value = r.steps || "";
+  document.getElementById("recipe-overlay").style.display = "flex";
+}
+
+function closeRecipe() { document.getElementById("recipe-overlay").style.display = "none"; activeKey = null; }
+
+function saveRecipe() {
+  if (!activeKey) return;
+  if (!data[activeKey]) data[activeKey] = { menu:"", recipe:null };
+  data[activeKey].recipe = {
+    ingredients: document.getElementById("r-ingredients").value,
+    seasoning: document.getElementById("r-seasoning").value,
+    steps: document.getElementById("r-steps").value,
+  };
+  save(); render(); closeRecipe();
+}
+
+function deleteMenu() {
+  if (!activeKey) return;
+  data[activeKey] = { menu:"", recipe:null };
+  save(); render(); closeRecipe();
+}
+
+function openSearch() {
+  document.getElementById("search-overlay").style.display = "flex";
+  setTimeout(() => document.getElementById("search-input").focus(), 100);
+}
+function closeSearch() { document.getElementById("search-overlay").style.display = "none"; }
+function clearSearch() { document.getElementById("search-input").value = ""; renderSearch(); }
+
+function renderSearch() {
+  const q = document.getElementById("search-input").value.trim().toLowerCase();
+  document.getElementById("clear-btn").style.display = q ? "block" : "none";
+  const el = document.getElementById("search-results");
+  if (!q) { el.innerHTML = '<p class="search-hint">재료명을 입력하세요</p>'; return; }
+
+  const results = Object.entries(data).filter(([,c]) => {
+    if (!c.recipe) return false;
+    return [c.menu, c.recipe.ingredients, c.recipe.seasoning, c.recipe.steps].join(" ").toLowerCase().includes(q);
+  });
+
+  if (!results.length) { el.innerHTML = '<p class="search-hint">검색 결과 없음</p>'; return; }
+
+  const hl = t => t ? t.replace(new RegExp(`(${q})`, "gi"), "<mark>$1</mark>") : "";
+
+  el.innerHTML = results.map(([key, c]) => {
+    const d = new Date(key);
+    const dayName = DAYS[(d.getDay()+6)%7];
+    return `<div class="result-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+        <span class="result-menu">${c.menu}</span>
+        <span class="result-date">${d.getMonth()+1}/${d.getDate()} (${dayName})</span>
+      </div>
+      ${c.recipe?.ingredients?`<div class="result-row"><span class="result-lbl">재료  </span>${hl(c.recipe.ingredients)}</div>`:""}
+      ${c.recipe?.seasoning?`<div class="result-row"><span class="result-lbl">양념  </span>${hl(c.recipe.seasoning)}</div>`:""}
+      ${c.recipe?.steps?`<div class="result-row"><span class="result-lbl">순서  </span>${hl(c.recipe.steps)}</div>`:""}
+    </div>`;
+  }).join("");
+}
+
+render();
+</script>
+</body>
+</html>
